@@ -17,6 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+"""
+
+Nessa parte aqui eu to importando dos meus próprios arquivos de views 
+(oq estou desenvolvendo para ser uma das páginas) para conseguir carregar em uma das urls
+
+"""
+
+from todos.views import home 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', home)
 ]

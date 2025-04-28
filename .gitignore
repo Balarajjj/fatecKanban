@@ -1,0 +1,30 @@
+# Python/Django
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+*.egg
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# Banco de dados (SQLite)
+*.sqlite3
+*.db
+
+# Arquivos sensíveis
+/settings/local.py
+
+# Static e Media
+/staticfiles/
+/mediafiles/
+
+# IDEs/Editores
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log

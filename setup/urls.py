@@ -25,6 +25,6 @@ Nessa parte aqui eu to importando dos meus próprios arquivos de views
 
 """
 
-from todos.views import home
+from todos.views import todo_list
 
-urlpatterns = [path("admin/", admin.site.urls), path("", home)]
+urlpatterns = [path("admin/", admin.site.urls), path("", todo_list)]

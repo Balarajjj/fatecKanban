@@ -4,82 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FATEC Kanban</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7xj1z5l5c5l5c5l5c5l5c5l5c5l5c5l5c" crossorigin="anonymous">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'fatec-red': '#A82324',
-                        'cps-blue': '#0067B1',
-                    }
-                }
-            }
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <style>
+        :root {
+            --fatec-red: #A82324;
+            --fatec-red-dark: #7a1a1b;
+            --sidebar-width: 260px;
         }
-    </script>
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Barra Superior Simplificada -->
-    <header class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-3 flex items-center">
-            <button id="menu-toggle" class="mr-4 text-fatec-red md:hidden">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-            
-            <div class="flex items-center">
-                <svg class="h-8 w-8 text-fatec-red" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-                </svg>
-                <h1 class="ml-2 text-xl font-bold text-fatec-red">FATEC KANBAN</h1>
+<body class="font-sans bg-gray-50">
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebar-toggle" class="sidebar-toggle">
+        <svg class="toggle-icon" viewBox="0 0 24 24">
+            <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class = "top">
+            <div class ="logo">
+                <i class="bx bcl-codepen"></i>
+                <span>Fatec KANBAN</span>
             </div>
-            
-            <div class="ml-auto flex items-center space-x-4">
-                <!-- Ícone de Notificação -->
-                <button class="p-2 text-fatec-red hover:bg-red-50 rounded-full relative">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
-                    <span class="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-                </button>
-                
-                <!-- Avatar do Usuário -->
-                <div class="h-8 w-8 bg-fatec-red rounded-full flex items-center justify-center text-white font-medium">
-                    {{ user.username|first|upper }}
-                </div>
+            <i class ="bx bx-menu" id="btn"></i>
+        </div>
+        <div class="user">
+            <img src="fatecKanban\media\profiles\user-img.png" alt="me" class="user-img">
+            <div>
+                <p class="bold">Teste</p>
+                <p>Admin</p>
             </div>
         </div>
-    </header>
+        <ul>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-home'></i>
+                    <span class= "nav-item"> Home</span>
+                </a>
+                <span class="tooltip">Home</span>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-paperclip' ></i>
+                    <span class= "nav-item"> Projetos</span>
+                </a>
+                <span class="tooltip">Projetos</span>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bx bxs-grid-alt"></i>
+                    <span class= "nav-item"> Dashboard</span>
+                </a>
+                <span class="tooltip">Dashboard</span>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-calendar'></i>
+                    <span class= "nav-item"> Calendário</span>
+                </a>
+                <span class="tooltip">Calendário</span>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-cog' ></i>
+                    <span class= "nav-item"> Configurações</span>
+                </a>
+                <span class="tooltip">Configurações</span>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-log-out' ></i>
+                    <span class= "nav-item"> Log-out</span>
+                </a>
+                <span class="tooltip">Log-out</span>
+            </li>
+        </ul>
 
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-fatec-red text-white fixed h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-10">
-            <div class="p-4 h-full flex flex-col">
-                <nav class="mt-8 space-y-2">
-                    <a href="#" class="block py-2 px-4 bg-fatec-red-dark rounded font-medium flex items-center">
-                        <svg class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-                        </svg>
-                        Projetos
-                    </a>
-                    <!-- Outros itens do menu -->
-                </nav>
-            </div>
-        </aside>
-
-        <!-- Conteúdo Principal -->
-        <main class="flex-1 p-6 ml-0 md:ml-64">
-            {% block content %}{% endblock %}
-        </main>
     </div>
-
-    <!-- JavaScript para o menu mobile -->
-    <script>
-        document.getElementById('menu-toggle').addEventListener('click', function() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        });
-    </script>
+    <!-- Conteúdo Principal -->
+    <main id="main-content" class="main-content">
+        {% block content %}{% endblock %}
+    </main>
 </body>
+
+<script>
+    let btn = document.querySelector("#btn");
+    let sidebar = document.querySelector(".sidebar");
+
+    btn.onclick = function() {
+        sidebar.classList.toggle("active");
+    };
+</script>
+
 </html>

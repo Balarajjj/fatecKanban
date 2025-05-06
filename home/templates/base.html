@@ -1,104 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FATEC Kanban</title>
+    <title>{% block title %}FATEC Kanban{% endblock %}</title>
+
+    <!-- Boxicons e Tailwind -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7xj1z5l5c5l5c5l5c5l5c5l5c5l5c5l5c" crossorigin="anonymous">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/css/sidebar.css">
-    <style>
-        :root {
-            --fatec-red: #A82324;
-            --fatec-red-dark: #7a1a1b;
-            --sidebar-width: 260px;
+
+    <!-- Cor personalizada FATEC -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fatecRed: '#A82324'
+                    }
+                }
+            }
         }
-    </style>
+    </script>
 </head>
-<body class="font-sans bg-gray-50">
-    <!-- Sidebar Toggle Button -->
-    <button id="sidebar-toggle" class="sidebar-toggle">
-        <svg class="toggle-icon" viewBox="0 0 24 24">
-            <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header fixo -->
+    <header class="fixed top-0 left-0 right-0 h-14 bg-fatecRed text-white flex items-center px-4 z-50 shadow">
+        <h1 class="text-lg font-semibold">FATEC Kanban</h1>
+    </header>
+
+    <!-- Botão flutuante para reabrir a sidebar (responsivo) -->
+    <button
+        id="openSidebar"
+        class="hidden fixed z-40 top-4 left-4 md:top-16 md:left-4 bg-fatecRed text-white p-2 rounded-full shadow-md hover:bg-[#8e1d1e] transition-all"
+        aria-label="Abrir menu"
+    >
+        <i class="bx bx-menu text-2xl"></i>
     </button>
 
     <!-- Sidebar -->
-    <div class="sidebar">
-        <div class = "top">
-            <div class ="logo">
-                <i class="bx bcl-codepen"></i>
-                <span>Fatec KANBAN</span>
-            </div>
-            <i class ="bx bx-menu" id="btn"></i>
+    <aside id="sidebar" class="bg-fatecRed text-white w-64 min-h-screen pt-14 fixed top-0 left-0 transition-transform duration-300 z-40">
+        <div class="flex items-center justify-between px-4 py-4">
+            <span class="text-lg font-bold">FATEC Kanban</span>
+            <button id="toggleSidebar" class="text-white focus:outline-none">
+                <i class='bx bx-x text-2xl'></i>
+            </button>
         </div>
-        <div class="user">
-            <img src="fatecKanban\media\profiles\user-img.png" alt="me" class="user-img">
+        <div class="flex items-center px-4 py-2">
+            <img src="{% static 'img/user.png' %}" alt="Avatar" class="w-10 h-10 rounded-full mr-3">
             <div>
-                <p class="bold">Teste</p>
-                <p>Admin</p>
+                <p class="font-semibold">Usuário</p>
+                <p class="text-sm">Admin</p>
             </div>
         </div>
-        <ul>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-home'></i>
-                    <span class= "nav-item"> Home</span>
-                </a>
-                <span class="tooltip">Home</span>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bx-paperclip' ></i>
-                    <span class= "nav-item"> Projetos</span>
-                </a>
-                <span class="tooltip">Projetos</span>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bx bxs-grid-alt"></i>
-                    <span class= "nav-item"> Dashboard</span>
-                </a>
-                <span class="tooltip">Dashboard</span>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-calendar'></i>
-                    <span class= "nav-item"> Calendário</span>
-                </a>
-                <span class="tooltip">Calendário</span>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-cog' ></i>
-                    <span class= "nav-item"> Configurações</span>
-                </a>
-                <span class="tooltip">Configurações</span>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bx-log-out' ></i>
-                    <span class= "nav-item"> Log-out</span>
-                </a>
-                <span class="tooltip">Log-out</span>
-            </li>
-        </ul>
+        <nav class="mt-4 space-y-2">
+            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-home text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Home</span>
+            </a>
+            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bx-paperclip text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Projetos</span>
+            </a>
+            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-grid-alt text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Dashboard</span>
+            </a>
+            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-calendar text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Calendário</span>
+            </a>
+            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-cog text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Configurações</span>
+            </a>
+            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bx-log-out text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Sair</span>
+            </a>
+        </nav>
+    </aside>
 
-    </div>
-    <!-- Conteúdo Principal -->
-    <main id="main-content" class="main-content">
-        {% block content %}{% endblock %}
+    <!-- Conteúdo principal -->
+    <main id="main-content" class="pt-16 ml-64 transition-all duration-300">
+        <div class="p-6">
+            {% block content %}{% endblock %}
+        </div>
     </main>
+
+    <!-- Script para toggle da sidebar -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const openBtn = document.getElementById('openSidebar');
+        const closeBtn = document.getElementById('toggleSidebar');
+        const content = document.getElementById('main-content');
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            openBtn.classList.remove('hidden');
+            content.classList.remove('ml-64');
+            content.classList.add('ml-0');
+        });
+
+        openBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            openBtn.classList.add('hidden');
+            content.classList.remove('ml-0');
+            content.classList.add('ml-64');
+        });
+    </script>
+
 </body>
-
-<script>
-    let btn = document.querySelector("#btn");
-    let sidebar = document.querySelector(".sidebar");
-
-    btn.onclick = function() {
-        sidebar.classList.toggle("active");
-    };
-</script>
-
 </html>

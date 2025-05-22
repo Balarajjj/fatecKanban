@@ -24,6 +24,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "home.apps.HomeConfig",  # Substitua todos.apps.TodosConfig
+    "accounts.apps.AccountsConfig",  # Adicionado para django-allauth
+]
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 MIDDLEWARE = [
@@ -64,6 +71,7 @@ DATABASES = {
     )
 }
 
+
 # Auth
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -74,9 +82,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/login/"
+LOGOUT_REDIRECT_URL = "accounts/login/"
 
 # Internationalization
 LANGUAGE_CODE = "pt-br"
@@ -85,7 +94,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Adicionado
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Adicionado
 STATICFILES_STORAGE = (

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -14,7 +14,7 @@ class Project(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nome do Projeto")
     description = models.TextField(blank=True, verbose_name="Descrição")
     owner = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="projects",
         verbose_name="Responsável",
@@ -23,7 +23,10 @@ class Project(models.Model):
         max_length=2, choices=STATUS_CHOICES, default="PL", verbose_name="Status"
     )
     members = models.ManyToManyField(
-        User, related_name="shared_projects", blank=True, verbose_name="Colaboradores"
+        settings.AUTH_USER_MODEL,
+        related_name="shared_projects",
+        blank=True,
+        verbose_name="Colaboradores",
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
@@ -38,7 +41,6 @@ class Project(models.Model):
 
     @property
     def progress(self):
-        """Calcula o progresso baseado nas tarefas concluídas"""
         tasks = self.tasks.all()
         if not tasks.exists():
             return 0
@@ -76,7 +78,7 @@ class Task(models.Model):
     )
     due_date = models.DateField(null=True, blank=True, verbose_name="Data de Conclusão")
     assigned_to = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -84,7 +86,7 @@ class Task(models.Model):
         verbose_name="Responsável",
     )
     created_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="created_tasks",
         verbose_name="Criado por",

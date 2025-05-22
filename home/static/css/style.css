@@ -1,0 +1,132 @@
+/* Variáveis e Reset */
+:root {
+    --drawer-width: 250px;
+    --header-height: 60px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Layout Principal */
+.layout {
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "drawer content";
+    grid-template-columns: auto 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.menu-button {
+    cursor: pointer;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Drawer */
+.drawer {
+    grid-area: drawer;
+    width: var(--drawer-width);
+    height: calc(100vh - var(--header-height));
+    position: fixed;
+    left: 0;
+    top: var(--header-height);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+    z-index: 20;
+    overflow-y: auto;
+}
+
+.drawer-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+    background-color: var(--fatec-red-dark);
+}
+
+.nav-item.active {
+    background-color: var(--fatec-red-dark);
+    border-left: 3px solid white;
+}
+
+/* Overlay */
+.drawer-overlay {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Conteúdo */
+.content {
+    grid-area: content;
+    padding: 1.5rem;
+    min-height: calc(100vh - var(--header-height));
+    transition: margin-left 0.3s;
+}
+
+/* Controle do Drawer */
+#drawer-toggle:checked ~ .layout .drawer {
+    transform: translateX(0);
+}
+
+#drawer-toggle:checked ~ .layout .drawer-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+    .menu-button {
+        display: none;
+    }
+    
+    .drawer {
+        transform: translateX(0);
+        position: relative;
+        top: 0;
+        height: 100vh;
+    }
+    
+    .drawer-overlay {
+        display: none;
+    }
+    
+    .content {
+        margin-left: var(--drawer-width);
+    }
+}

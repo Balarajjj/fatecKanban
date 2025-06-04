@@ -3,15 +3,23 @@
 {% block content %}
 <div class="mb-8">
     <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-start">
+            <a href="{% url 'project-create' %}" class="bg-fatecRed hover:bg-red-700 text-white px-6 py-2 rounded-lg shadow transition flex items-center">
+                <!-- Ícone de Adicionar Projeto -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Novo Projeto
+            </a>
+        </div>
         <h2 class="text-2xl font-bold text-fatec-red">Meus Projetos</h2>
-        <button class="bg-cps-blue text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
-            Novo Projeto
-        </button>
     </div>
+</div>
 
+    <div class="max-w-7xl mx-auto px-4 sm:px-2 lg:px-4">
+        <div class="mb-6">
+            <p class="text-gray-600">Aqui estão os projetos que você criou ou está participando.</p>
+    </div> 
     <!-- Grid de Projetos -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for project in projects %}

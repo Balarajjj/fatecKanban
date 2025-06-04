@@ -18,6 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from home import views
+from tasks import views as task_views
+from calendarapp import views as calendar_views
+from django.contrib.auth import views as auth_views
+
 
 """
 
@@ -28,7 +32,9 @@ Nessa parte aqui eu to importando dos meus próprios arquivos de views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.home_view, name="home"),
     path("project/<int:project_id>/", views.project_view, name="project"),
     path("accounts/", include("accounts.urls")),
+    path("tarefas/", include("tasks.urls")),
+    path("calendario/", include("calendarapp.urls")),
+    path("", include("home.urls")),
 ]

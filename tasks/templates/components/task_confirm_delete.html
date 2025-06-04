@@ -1,0 +1,7 @@
+<form method="post">
+  {% csrf_token %}
+  <p>Tem certeza de que deseja excluir a tarefa "{{ object.title }}"?</p>
+  <button type="submit">Sim, excluir</button>
+  <a href="{% url 'project' project_id=object.project.id %}">Cancelar</a>
+</form>
+

@@ -16,8 +16,8 @@ class CalendarView(LoginRequiredMixin, TemplateView):
         # Pega ano e mês da query string, ou usa hoje se não informado
         year = self.request.GET.get("year")
         month = self.request.GET.get("month")
-
         today = date.today()
+        context["today"] = today
 
         try:
             year = int(year)

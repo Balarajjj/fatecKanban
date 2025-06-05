@@ -28,21 +28,28 @@
   </div>
 
   <div class="grid grid-cols-7 gap-2 text-sm">
-    {# Espaços em branco antes do primeiro dia do mês #}
     {% for _ in "0123456"|make_list %}
       {% if forloop.counter0 < weekday_start %}
         <div>&nbsp;</div>
       {% endif %}
     {% endfor %}
 
-    {# Dias do mês #}
     {% for day in days %}
       <div class="border rounded p-2 min-h-[80px] text-left bg-gray-50 hover:bg-blue-100">
         <div class="font-semibold">{{ day.day }}</div>
         {% with tasks=calendar_tasks_by_date|get_item:day.date_str %}
           {% if tasks %}
             {% for task in tasks %}
-              <div class="text-xs text-blue-800">• {{ task.title }}</div>
+              {% if task.due_date and task.due_date < today %}
+                <div class="text-sm text-red-700 bg-red-100 p-1 rounded mt-1 flex items-center gap-1">
+                  <i class='bx bx-error-circle'></i>
+                  {{ task.title }} — {{ task.project.name }}
+                </div>
+              {% else %}
+                <div class="text-sm text-blue-800 mt-1">
+                  • {{ task.title }} — {{ task.project.name }}
+                </div>
+              {% endif %}
             {% endfor %}
           {% else %}
             <div class="text-xs text-gray-400">Sem tarefas</div>

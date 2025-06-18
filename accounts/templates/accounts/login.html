@@ -1,0 +1,88 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login - Sistema de Projetos FATEC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fatecRed: '#A82324'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-fatecRed py-4 flex justify-center items-center shadow-md">
+        <h1 class="text-2xl font-bold tracking-wide uppercase text-white">
+            meu<span class="italic font-extralight">CPS</span>
+        </h1>
+    </header>
+
+    <!-- Conteúdo principal com flex-grow para ocupar o espaço entre header e footer -->
+    <main class="flex-grow flex items-center justify-center px-4">
+        <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
+
+            <!-- Lado esquerdo: Formulário -->
+            <div class="p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Acesso ao Sistema</h2>
+
+                {% if form.errors %}
+                    <div class="mb-4 text-red-600 text-sm">
+                        Verifique seus dados. Apenas e-mails @fatec.sp.gov.br são aceitos.
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-6">
+                        {{ form.username.label_tag }}
+                        {{ form.username|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-fatecRed" }}
+                        {% if form.username.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-6">
+                        {{ form.password.label_tag }}
+                        {{ form.password|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-fatecRed" }}
+                        {% if form.password.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="w-full bg-fatecRed hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition">
+                        Entrar
+                    </button>
+                </form>
+
+                <p class="mt-6 text-sm text-center text-gray-600">
+                    Ainda não tem uma conta?
+                    <a href="{% url 'register' %}" class="text-blue-600 hover:underline">Cadastre-se</a>
+                </p>
+            </div>
+
+            <!-- Lado direito: Imagem ou gráfico -->
+            <div class="bg-gray-200 flex items-center justify-center p-4">
+                <img src="{% static 'images/vestibular.png' %}" alt="Anúncio FATEC" class="max-h-[350px] object-contain" />
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-300 py-4 text-center text-gray-700 text-sm">
+        Com problema para login? 
+        <a href="#" class="text-blue-600 underline hover:text-blue-800">Acesse Secretaria Virtual</a>
+    </footer>
+
+</body>
+</html>

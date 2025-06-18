@@ -4,13 +4,11 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FATEC Kanban{% endblock %}</title>
+    <title>{% block title %}FatecTask{% endblock %}</title>
 
-    <!-- Boxicons e Tailwind -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Cor personalizada FATEC -->
     <script>
         tailwind.config = {
             theme: {
@@ -25,89 +23,104 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- Header fixo -->
+<!-- Header -->
 <header class="fixed top-0 left-0 right-0 h-14 bg-fatecRed text-white flex items-center px-4 z-50 shadow">
-    <!-- Botão no lado esquerdo -->
     <button
-        id="openSidebar"
-        class="bg-white text-fatecRed p-2 rounded-full shadow hover:bg-gray-200 transition-all mr-4"
-        aria-label="Abrir menu"
+        id="toggleSidebarBtn"
+        class="bg-white text-fatecRed w-12 h-12 p-2 rounded-full shadow hover:bg-gray-200 hover:shadow-md transition-all duration-200 flex items-center justify-center"
+        aria-label="Abrir/Fechar menu"
     >
         <i class="bx bx-menu text-2xl"></i>
     </button>
-
-    <!-- Título após o botão -->
-    <h1 class="text-lg font-semibold">FATEC Kanban</h1>
+    <h1 class="text-2xl font-bold tracking-wide uppercase ml-4">Fatec<span class="italic font-extralight">Task</span></h1>
 </header>
 
 
-
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="bg-fatecRed text-white w-64 min-h-screen pt-14 fixed top-0 left-0 transition-transform duration-300 z-40">
-        <div class="flex items-center justify-between px-4 py-4">
-             <div class="flex items-center px-4 py-2">
-            <img src="{% static 'img/user.png' %}" alt="Avatar" class="w-10 h-10 rounded-full mr-3">
-            <div>
-                <p class="font-semibold">Usuário</p>
-                <p class="text-sm">Admin</p>
-            </div>
-        </div>
-            <button id="toggleSidebar" class="text-white focus:outline-none">
-                <i class='bx bx-x text-2xl'></i>
-            </button>
-        </div>
-       
-        <nav class="mt-4 space-y-2">
-            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
-                <i class='bx bxs-home text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Home</span>
+<!-- Sidebar -->
+<aside id="sidebar" class="bg-fatecRed text-white w-64 min-h-screen pt-14 fixed top-0 left-0 transition-transform duration-300 z-40 flex flex-col justify-between text-lg">
+    <div>     
+        <nav class="mt-4 space-y-2 text-lg">
+            <a href="{% url 'dashboard_home' %}" class="flex items-center px-6 py-3 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-home text-2xl mr-3'></i> <span>Home</span>
             </a>
-            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
-                <i class='bx bx-paperclip text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Projetos</span>
+            <a href="{% url 'home' %}" class="flex items-center px-6 py-3 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bx-paperclip text-2xl mr-3'></i> <span>Projetos</span>
             </a>
-            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
-                <i class='bx bxs-grid-alt text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Dashboard</span>
+            <a href="{% url 'calendar' %}" class="flex items-center px-6 py-3 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-calendar text-2xl mr-3'></i> <span>Calendário</span>
             </a>
-            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
-                <i class='bx bxs-calendar text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Calendário</span>
-            </a>
-            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
-                <i class='bx bxs-cog text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Configurações</span>
-            </a>
-            <a href="#" class="flex justify-center md:justify-start items-center px-4 py-2 hover:bg-white hover:text-fatecRed transition">
-                <i class='bx bx-log-out text-xl mr-0 md:mr-3'></i> <span class="sidebar-label hidden md:inline">Sair</span>
+            <a href="{% url 'useful-links' %}" class="flex items-center px-6 py-3 hover:bg-white hover:text-fatecRed transition">
+                <i class='bx bxs-grid-alt text-2xl mr-3'></i> <span>Ajuda</span>
             </a>
         </nav>
-    </aside>
+    </div>
 
-    <!-- Conteúdo principal -->
-    <main id="main-content" class="pt-16 ml-64 transition-all duration-300">
-        <div class="p-6">
-            {% block content %}{% endblock %}
+    <!-- Rodapé -->
+    <div class="border-t border-white/30 px-4 pt-4 pb-6 space-y-3 text-lg">
+        <div class="flex items-center space-x-3">
+            <img src="{% static 'media/profiles/user-img.png' %}" alt="Avatar" class="w-10 h-10 rounded-full">
+            <div class="truncate">
+                <p class="font-semibold truncate w-36 capitalize">{{ request.user.get_full_name|truncatewords:2 }}</p>
+                <p class="text-sm truncate w-36">{{ request.user.email }}</p>
+            </div>
         </div>
-    </main>
+        <div class="flex justify-between px-2 mt-2">
+            <a href="#" title="Configurações" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:shadow transition">
+                <i class='bx bxs-cog text-2xl'></i>
+            </a>
+            <a href="#" title="Sair" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:shadow transition">
+                <i class='bx bx-log-out text-2xl'></i>
+            </a>
+        </div>
+    </div>
+</aside>
 
-    <!-- Script para toggle da sidebar -->
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const openBtn = document.getElementById('openSidebar');
-        const closeBtn = document.getElementById('toggleSidebar');
-        const content = document.getElementById('main-content');
+<!-- Conteúdo principal -->
+<main id="main-content" class="pt-16 ml-64 transition-all duration-300">
+    <div class="p-6">
+        {% block content %}{% endblock %}
+    </div>
+</main>
 
-        closeBtn.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            openBtn.classList.remove('hidden');
-            content.classList.remove('ml-64');
-            content.classList.add('ml-0');
+<!-- Footer -->
+<footer class="bg-gray-100 text-gray-800 text-center py-4 mt-8 shadow-inner">
+    <p>&copy; 2025 FATEC.</p>
+    <p>Todos os direitos reservados.</p>
+</footer>
+
+<!-- Script sidebar -->
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const mainContent = document.getElementById('main-content');
+    let isSidebarOpen = true;
+
+    toggleBtn.addEventListener('click', () => {
+        isSidebarOpen = !isSidebarOpen;
+        sidebar.classList.toggle('-translate-x-full');
+        mainContent.classList.toggle('ml-0');
+        mainContent.classList.toggle('ml-64');
+
+        // Alterna ícone corretamente
+        const icon = toggleBtn.querySelector('i');
+        icon.classList.toggle('bx-menu', !isSidebarOpen);
+        icon.classList.toggle('bx-x', isSidebarOpen);
+    });
+</script>
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const statusButtons = document.querySelectorAll(".status-button");
+        statusButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                statusButtons.forEach(btn => btn.classList.remove("ring-4", "ring-offset-2", "ring-black"));
+                button.classList.add("ring-4", "ring-offset-2", "ring-black");
+                button.previousElementSibling.checked = true;
+            });
         });
-
-        openBtn.addEventListener('click', () => {
-            sidebar.classList.remove('-translate-x-full');
-            openBtn.classList.add('hidden');
-            content.classList.remove('ml-0');
-            content.classList.add('ml-64');
-        });
-    </script>
-
+    });
+</script>
+{% endblock %}
 </body>
 </html>

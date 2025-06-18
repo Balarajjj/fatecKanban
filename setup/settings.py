@@ -24,6 +24,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "home.apps.HomeConfig",  # Substitua todos.apps.TodosConfig
+    "accounts.apps.AccountsConfig",
+    "tasks.apps.TasksConfig",  # Adicionado
+    "calendarapp.apps.CalendarappConfig",  # Adicionado
+    "widget_tweaks",  # Adicionado
+]
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 MIDDLEWARE = [
@@ -64,6 +74,7 @@ DATABASES = {
     )
 }
 
+
 # Auth
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -74,9 +85,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/login/"
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+LOGOUT_REDIRECT_URL = "accounts/login/"
 
 # Internationalization
 LANGUAGE_CODE = "pt-br"
@@ -85,9 +97,11 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Adicionado
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # Adicionado
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]  # Adicionado
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"  # Adicionado
 )
@@ -99,11 +113,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")  # Adicionado
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email Configuration (para futuras funcionalidades)
-EMAIL_BACKEND = config(
-    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
-)
-EMAIL_HOST = config("EMAIL_HOST", default="")
-EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+# Email Configuration (envio real via Gmail)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "portal.meucps@gmail.com"
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # Senha do app Gmail
+DEFAULT_FROM_EMAIL = "FatecKanban <portal.meucps@gmail.com>"

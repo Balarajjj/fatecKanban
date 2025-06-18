@@ -1,0 +1,26 @@
+{
+  "name": "fateckanban",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch:css": "npx tailwindcss/cli -i ./static/css/style.css -o ./static/dist/style.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Balarajjj/fatecKanban.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Balarajjj/fatecKanban/issues"
+  },
+  "homepage": "https://github.com/Balarajjj/fatecKanban#readme",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.8",
+    "tailwindcss": "^4.1.8"
+  }
+}

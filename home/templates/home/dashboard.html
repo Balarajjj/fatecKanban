@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto mt-10 p-6">
+    <h2 class="text-3xl font-bold text-fatecRed mb-8">Dashboard Geral</h2>
+
+    <!-- Linha de cima -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+
+        <!-- Card: Tarefas próximas do vencimento -->
+        <div class="bg-white shadow rounded-2xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Tarefas Próximas do Vencimento</h3>
+            <ul class="space-y-3">
+                {% if upcoming_tasks %}
+                    {% for task in upcoming_tasks %}
+                        <li class="flex justify-between items-center">
+                            <span class="text-gray-700 font-medium">{{ task.title }}</span>
+                            <span class="text-sm text-gray-500">{{ task.due_date|date:"d/m/Y" }}</span>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="text-gray-500">Nenhuma tarefa próxima do vencimento.</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Card: Gráfico de Pizza -->
+        <div class="bg-white shadow rounded-2xl p-6">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Status das Tarefas</h3>
+            <canvas id="taskStatusChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Linha de baixo: Projetos em destaque -->
+    <div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Projetos em Destaque</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for project in top_projects %}
+                <div class="bg-white shadow rounded-2xl p-5 hover:shadow-md transition">
+                    <h4 class="text-lg font-semibold text-fatecRed mb-2">{{ project.title }}</h4>
+                    <p class="text-gray-700 text-sm mb-2">{{ project.description|truncatewords:20 }}</p>
+                    <p class="text-gray-500 text-sm">Total de Tarefas: {{ project.tasks.count }}</p>
+                    <a href="/projeto/{{ project.id }}/" class="text-sm text-fatecRed mt-2 inline-block hover:underline">
+                        Ver Projeto →
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Script Chart.js -->
+ {{ status_data|json_script:"status-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const rawData = JSON.parse(document.getElementById("status-data").textContent);
+    const ctx = document.getElementById('taskStatusChart').getContext('2d');
+    const taskStatusChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(rawData),
+            datasets: [{
+                label: 'Status das Tarefas',
+                data: Object.values(rawData),
+                backgroundColor: ['#ef4444', '#facc15', '#10b981'],
+                borderColor: ['#fff'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+            }
+        }
+    });
+</script>
+
+{% endblock %}

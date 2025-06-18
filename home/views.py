@@ -99,11 +99,23 @@ def home_view(request):
     return render(request, "home/index.html", {"projects": projects, "section": "home"})
 
 
+from django.shortcuts import get_object_or_404, render
+from collections import Counter
+from django.db.models import Q, Count
+from tasks.models import Task
+from .models import Project
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
+
 def project_view(request, project_id):
     """View detalhada do projeto com quadro Kanban e dashboards"""
     project = get_object_or_404(
-        Project.objects.prefetch_related("tasks", "members"),
-        Q(id=project_id) & (Q(owner=request.user) | Q(members__in=[request.user])),
+        Project.objects.prefetch_related("tasks", "members")
+        .filter(
+            Q(id=project_id) & (Q(owner=request.user) | Q(members__in=[request.user]))
+        )
+        .distinct()
     )
 
     # Quadro Kanban
@@ -115,6 +127,11 @@ def project_view(request, project_id):
 
     all_tasks = project.tasks.all()
 
+    # ✅ Cálculo da barra de progresso
+    total_tasks = all_tasks.count()
+    completed_tasks = all_tasks.filter(status="CO").count()
+    progress = int((completed_tasks / total_tasks) * 100) if total_tasks > 0 else 0
+
     # Dados para gráfico de pizza
     status_counts = Counter(all_tasks.values_list("status", flat=True))
     status_display = {
@@ -123,11 +140,10 @@ def project_view(request, project_id):
         "CO": "Concluídas",
     }
 
-    # Cores personalizadas para cada status
     status_colors = {
-        "TD": "#ef4444",  # Vermelho
-        "DG": "#facc15",  # Amarelo
-        "CO": "#10b981",  # Verde
+        "TD": "#ef4444",
+        "DG": "#facc15",
+        "CO": "#10b981",
     }
 
     status_data = {
@@ -136,14 +152,12 @@ def project_view(request, project_id):
         "colors": [status_colors.get(k, "#999999") for k in status_counts.keys()],
     }
 
-    # Dados para gráfico de barras horizontais
     collaborators_data = (
         all_tasks.values("assigned_to__first_name")
         .annotate(task_count=Count("id"))
         .order_by("-task_count")
     )
 
-    # Cores distintas para cada colaborador
     collaborator_colors = [
         "#3b82f6",
         "#ef4444",
@@ -156,6 +170,7 @@ def project_view(request, project_id):
         "#84cc16",
         "#6366f1",
     ]
+
     kanban_columns = [
         ("TD", "A Fazer", "todo"),
         ("DG", "Em Progresso", "doing"),
@@ -174,12 +189,13 @@ def project_view(request, project_id):
     context = {
         "project": project,
         "tasks": tasks,
+        "progress": progress,  # ✅ progresso para usar no HTML
         "status_data_json": json.dumps(status_data, cls=DjangoJSONEncoder),
         "task_by_collaborator_json": json.dumps(
             task_by_collaborator, cls=DjangoJSONEncoder
         ),
         "has_tasks": all_tasks.exists(),
-        "kanban_columns": kanban_columns,  # Para verificar se há dados
+        "kanban_columns": kanban_columns,
     }
 
     return render(request, "home/projects.html", context)
@@ -238,9 +254,13 @@ def update_task_status(request, task_id):
 @login_required
 def useful_links_view(request):
     links = [
-        {"name": "Portal do Aluno", "url": "https://portaldoaluno.fatec.sp.gov.br/"},
+        {"name": "FATEC São Paulo", "url": "https://www.fatecsp.br"},
         {"name": "SIGA", "url": "https://siga.cps.sp.gov.br/"},
         {"name": "Microsoft Teams", "url": "https://teams.microsoft.com/"},
-        {"name": "Biblioteca Virtual", "url": "https://bv.cps.sp.gov.br/"},
+        {"name": "Secretaria Virtual", "url": "https://bv.cps.sp.gov.br/"},
+        {
+            "name": "Fale Conosco",
+            "url": "https://www.fatecsp.br/paginas/fale_conosco.php",
+        },
     ]
     return render(request, "useful_links.html", {"links": links})

@@ -31,6 +31,24 @@ class CalendarView(LoginRequiredMixin, TemplateView):
         except (TypeError, ValueError):
             month = today.month
 
+        # Mapeia os meses para nomes em português (sem depender de locale)
+        meses_pt = [
+            "",
+            "Janeiro",
+            "Fevereiro",
+            "Março",
+            "Abril",
+            "Maio",
+            "Junho",
+            "Julho",
+            "Agosto",
+            "Setembro",
+            "Outubro",
+            "Novembro",
+            "Dezembro",
+        ]
+        month_name = meses_pt[month]
+
         # Busca as tasks apenas no mês/ano atuais
         tasks = Task.objects.filter(
             assigned_to=user, due_date__year=year, due_date__month=month
@@ -74,6 +92,7 @@ class CalendarView(LoginRequiredMixin, TemplateView):
                 "semester": semester,
                 "year": year,
                 "month": f"{month:02d}",
+                "month_name": month_name,
                 "days": days,
                 "weekday_start": weekday_start,
                 "prev_year": prev_year,

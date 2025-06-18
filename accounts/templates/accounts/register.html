@@ -1,0 +1,91 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro - Sistema de Projetos FATEC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fatecRed: '#A82324'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-fatecRed py-4">
+        <h1 class="text-white text-2xl font-bold tracking-wide uppercase text-center">
+            meu<span class="italic font-extralight">CPS</span>
+        </h1>
+    </header>
+
+    <!-- Conteúdo principal centralizado -->
+    <main class="flex-grow flex items-center justify-center px-4">
+
+        <div class="w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
+            <!-- Lado esquerdo: Formulário de cadastro -->
+            <div class="p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Criar Conta</h2>
+
+                {% if form.errors %}
+                    <div class="mb-4 text-red-600 text-sm">
+                        Corrija os erros abaixo para continuar.
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        {{ form.username.label_tag }}
+                        {{ form.username|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-fatecRed" }}
+                        {% if form.username.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.password1.label_tag }}
+                        {{ form.password1|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-fatecRed" }}
+                        {% if form.password1.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.password1.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.password2.label_tag }}
+                        {{ form.password2|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-fatecRed" }}
+                        {% if form.password2.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.password2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+                        Criar Conta
+                    </button>
+                </form>
+
+                <p class="mt-6 text-sm text-center text-gray-600">
+                    Já possui uma conta?
+                    <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Faça login</a>
+                </p>
+            </div>
+
+            <!-- Lado direito: Imagem ou banner -->
+            <div class="bg-gray-200 flex items-center justify-center p-4">
+                <img src="{% static 'images/vestibular.png' %}" alt="FATEC Vestibular" class="max-h-[350px] object-contain">
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

@@ -20,6 +20,7 @@ from django.urls import path, include
 from home import views
 from tasks import views as task_views
 from calendarapp import views as calendar_views
+from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
 
 
@@ -36,5 +37,11 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("tarefas/", include("tasks.urls")),
     path("calendario/", include("calendarapp.urls")),
+    path("login/", include("accounts.urls")),
+    path(
+        "logout/",
+        auth_views.LogoutView.as_view(template_name="accounts/logout.html"),
+        name="logout",
+    ),
     path("", include("home.urls")),
 ]

@@ -1,11 +1,14 @@
-{% extends "base.html" %} 
-{% block content %}
+{% extends "base.html" %}
 
+{% block content %}
 <div class="max-w-xl mx-auto mt-20 bg-white p-8 rounded-2xl shadow-md">
-    <h2 class="text-3xl font-bold text-fatecRed mb-6">Novo Projeto</h2>
-    <form method="post" class="space-y-4">
+    <h2 class="text-3xl font-bold text-fatecRed mb-6">
+        {% if form.instance.pk %}Editar Projeto{% else %}Novo Projeto{% endif %}
+    </h2>
+    <form method="post" class="space-y-4" id="project-form">
         {% csrf_token %}
         {% for field in form %}
+            {% if field.name != "members" %}
             <div>
                 <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
                     {{ field.label }}
@@ -18,7 +21,32 @@
                     <p class="text-sm text-red-600 mt-1">{{ field.errors }}</p>
                 {% endif %}
             </div>
+            {% endif %}
         {% endfor %}
+
+        <!-- Campo oculto para enviar IDs dos membros como CSV -->
+        <input type="hidden" name="members_ids" id="members_ids" value="">
+
+        <div>
+            <label for="user-search" class="block text-sm font-medium text-gray-700 mb-1">Adicionar Membros</label>
+            <input type="text" id="user-search" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Buscar usuários por nome ou username">
+            <ul id="search-results" class="border border-gray-300 rounded max-h-40 overflow-y-auto mt-1 hidden"></ul>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Membros selecionados</label>
+            <ul id="selected-members" class="space-y-1">
+                {% if form.instance.pk %}
+                    {% for member in form.instance.members.all %}
+                        <li data-user-id="{{ member.id }}" class="flex justify-between items-center bg-gray-100 rounded px-3 py-1">
+                            <span>{{ member.first_name }} {{ member.last_name }} ({{ member.username }})</span>
+                            <button type="button" class="text-red-600 font-bold remove-member-btn">&times;</button>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+
         <div class="flex justify-end">
             <button type="submit" class="bg-fatecRed hover:bg-red-700 text-white px-6 py-2 rounded-lg shadow transition">
                 Salvar
@@ -27,4 +55,79 @@
     </form>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('user-search');
+    const resultsList = document.getElementById('search-results');
+    const selectedMembersList = document.getElementById('selected-members');
+    const membersIdsInput = document.getElementById('members_ids');
+
+    function updateMembersIds() {
+        const ids = Array.from(selectedMembersList.querySelectorAll('li')).map(li => li.getAttribute('data-user-id'));
+        membersIdsInput.value = ids.join(',');  // CSV string
+    }
+
+    selectedMembersList.addEventListener('click', (e) => {
+        if(e.target.classList.contains('remove-member-btn')) {
+            e.target.closest('li').remove();
+            updateMembersIds();
+        }
+    });
+
+    let debounceTimeout = null;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimeout);
+        const query = searchInput.value.trim();
+        if(query.length < 2) {
+            resultsList.innerHTML = '';
+            resultsList.classList.add('hidden');
+            return;
+        }
+        debounceTimeout = setTimeout(() => {
+            fetch(`/user_search_api/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsList.innerHTML = '';
+                    if(data.results.length === 0) {
+                        resultsList.classList.add('hidden');
+                        return;
+                    }
+                    data.results.forEach(user => {
+                        if(selectedMembersList.querySelector(`li[data-user-id="${user.id}"]`)) return;
+                        const li = document.createElement('li');
+                        li.textContent = `${user.full_name || user.username}`;
+                        li.className = 'px-3 py-2 hover:bg-fatecRed hover:text-white cursor-pointer';
+                        li.dataset.userId = user.id;
+                        li.dataset.username = user.username;
+                        li.dataset.fullName = user.full_name;
+                        resultsList.appendChild(li);
+                    });
+                    resultsList.classList.remove('hidden');
+                });
+        }, 300);
+    });
+
+    resultsList.addEventListener('click', (e) => {
+        if(e.target.tagName === 'LI') {
+            const userId = e.target.dataset.userId;
+            const fullName = e.target.dataset.fullName;
+            const username = e.target.dataset.username;
+
+            const li = document.createElement('li');
+            li.setAttribute('data-user-id', userId);
+            li.className = 'flex justify-between items-center bg-gray-100 rounded px-3 py-1';
+            li.innerHTML = `<span>${fullName || username}</span><button type="button" class="text-red-600 font-bold remove-member-btn">&times;</button>`;
+            selectedMembersList.appendChild(li);
+
+            updateMembersIds();
+
+            resultsList.innerHTML = '';
+            resultsList.classList.add('hidden');
+            searchInput.value = '';
+        }
+    });
+
+    updateMembersIds();
+});
+</script>
 {% endblock %}

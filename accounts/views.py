@@ -21,7 +21,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("home")
+            return redirect("dashboard_home")  # Ou o nome da sua URL de dashboard
     else:
         form = CustomLoginForm()
     return render(request, "accounts/login.html", {"form": form})
@@ -29,4 +29,4 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("login")  # Ou o nome da sua URL de login

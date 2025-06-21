@@ -24,15 +24,54 @@
 <body class="bg-gray-100 text-gray-800">
 
 <!-- Header -->
-<header class="fixed top-0 left-0 right-0 h-14 bg-fatecRed text-white flex items-center px-4 z-50 shadow">
-    <button
-        id="toggleSidebarBtn"
-        class="bg-white text-fatecRed w-12 h-12 p-2 rounded-full shadow hover:bg-gray-200 hover:shadow-md transition-all duration-200 flex items-center justify-center"
-        aria-label="Abrir/Fechar menu"
-    >
-        <i class="bx bx-menu text-2xl"></i>
-    </button>
-    <h1 class="text-2xl font-bold tracking-wide uppercase ml-4">Fatec<span class="italic font-extralight">Task</span></h1>
+<header class="fixed top-0 left-0 right-0 h-14 bg-fatecRed text-white flex items-center justify-between px-4 z-50 shadow">
+    <div class="flex items-center">
+        <button
+            id="toggleSidebarBtn"
+            class="bg-white text-fatecRed w-12 h-12 p-2 rounded-full shadow hover:bg-gray-200 hover:shadow-md transition-all duration-200 flex items-center justify-center"
+            aria-label="Abrir/Fechar menu"
+        >
+            <i class="bx bx-menu text-2xl"></i>
+        </button>
+        <h1 class="text-2xl font-bold tracking-wide uppercase ml-4">Fatec<span class="italic font-extralight">Task</span></h1>
+    </div>
+
+    <!-- Notification Icon -->
+    <div class="relative group">
+        <button id="notificationBtn" class="relative w-10 h-10 flex items-center justify-center text-white hover:text-gray-200 focus:outline-none">
+            <i class='bx bx-bell text-2xl'></i>
+            {% with notifications=request.user.notifications_unread %}
+            {% if notifications.count %}
+                <span class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                    {{ notifications.count }}
+                </span>
+            {% endif %}
+            {% endwith %}
+        </button>
+
+        <!-- Dropdown -->
+        <div class="hidden group-hover:block absolute right-0 mt-2 w-72 bg-white text-gray-800 rounded shadow-lg z-50 max-h-80 overflow-y-auto">
+            <div class="p-3 font-semibold border-b border-gray-200">Notificações</div>
+            {% with notifications=request.user.notifications_unread %}
+                {% if notifications %}
+                    <ul>
+                        {% for notif in notifications|slice:":5" %}
+                            <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-100 text-sm">
+                                {{ notif.message }}
+                                <br>
+                                <span class="text-xs text-gray-500">{{ notif.created_at|date:"d/m/Y H:i" }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="px-4 py-2 text-sm text-center">
+                        <a href="{% url 'notifications' %}" class="text-blue-600 hover:underline">Ver todas</a>
+                    </div>
+                {% else %}
+                    <div class="px-4 py-4 text-sm text-center text-gray-500">Sem novas notificações</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
 </header>
 
 
@@ -58,7 +97,7 @@
     <!-- Rodapé -->
     <div class="border-t border-white/30 px-4 pt-4 pb-6 space-y-3 text-lg">
         <div class="flex items-center space-x-3">
-            <img src="{% static 'media/profiles/user-img.png' %}" alt="Avatar" class="w-10 h-10 rounded-full">
+            <img src="{% static 'media/profiles/user.png' %}" alt="Avatar" class="w-10 h-10 rounded-full">
             <div class="truncate">
                 <p class="font-semibold truncate w-36 capitalize">{{ request.user.get_full_name|truncatewords:2 }}</p>
                 <p class="text-sm truncate w-36">{{ request.user.email }}</p>
@@ -68,7 +107,7 @@
             <a href="#" title="Configurações" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:shadow transition">
                 <i class='bx bxs-cog text-2xl'></i>
             </a>
-            <a href="#" title="Sair" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:shadow transition">
+            <a href="{% url 'logout' %}" title="Sair" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:shadow transition">
                 <i class='bx bx-log-out text-2xl'></i>
             </a>
         </div>

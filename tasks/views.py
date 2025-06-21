@@ -11,6 +11,7 @@ import json
 from .models import Task
 from .forms import TaskForm
 from home.models import Project
+from notifications.models import Notification  # IMPORTANTE
 
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
@@ -22,9 +23,22 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
         form.instance.project = project
         form.instance.created_by = self.request.user
+
         if not form.instance.assigned_to:
             form.instance.assigned_to = project.owner
-        return super().form_valid(form)
+
+        response = super().form_valid(form)
+
+        # Notifica se o responsável não for o criador
+        assigned_user = form.instance.assigned_to
+        if assigned_user and assigned_user != self.request.user:
+            Notification.objects.create(
+                user=assigned_user,
+                task=form.instance,
+                message=f"Você foi atribuído à tarefa: {form.instance.title}",
+            )
+
+        return response
 
     def get_success_url(self):
         return reverse_lazy("project", kwargs={"project_id": self.kwargs["project_id"]})
@@ -47,6 +61,26 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         return Task.objects.filter(
             Q(project__owner=self.request.user) | Q(project__members=self.request.user)
         ).distinct()
+
+    def form_valid(self, form):
+        old_task = self.get_object()
+        old_assigned_to = old_task.assigned_to
+        new_assigned_to = form.cleaned_data.get("assigned_to")
+
+        response = super().form_valid(form)
+
+        if (
+            new_assigned_to
+            and new_assigned_to != old_assigned_to
+            and new_assigned_to != self.request.user
+        ):
+            Notification.objects.create(
+                user=new_assigned_to,
+                task=self.object,
+                message=f"Você foi atribuído à tarefa: {self.object.title}",
+            )
+
+        return response
 
 
 class TaskDeleteView(LoginRequiredMixin, DeleteView):

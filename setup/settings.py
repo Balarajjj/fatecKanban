@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "tasks.apps.TasksConfig",  # Adicionado
     "calendarapp.apps.CalendarappConfig",  # Adicionado
+    "notifications.apps.NotificationsConfig",  # Adicionado
     "widget_tweaks",  # Adicionado
 ]
 

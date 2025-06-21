@@ -29,12 +29,6 @@ class CustomLoginForm(AuthenticationForm):
         ),
     )
 
-    def clean_username(self):
-        email = self.cleaned_data.get("username")
-        if not email.endswith("@fatec.sp.gov.br"):
-            raise ValidationError("Use apenas e-mails @fatec.sp.gov.br.")
-        return email
-
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
@@ -60,9 +54,3 @@ class CustomUserCreationForm(UserCreationForm):
                 }
             ),
         }
-
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if not email.endswith("@fatec.sp.gov.br"):
-            raise ValidationError("Use apenas e-mails @fatec.sp.gov.br.")
-        return email

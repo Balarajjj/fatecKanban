@@ -1,51 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="mb-8">
+<div class="max-w-7xl mx-auto mt-10 p-6">
+    <!-- Cabeçalho -->
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-fatec-red">Meus Projetos</h2>
-        <div class="flex justify-end">
-            <a href="{% url 'project-create' %}" class="bg-fatecRed hover:bg-red-700 text-white px-6 py-2 rounded-lg shadow transition flex items-center">
-                <!-- Ícone de Adicionar Projeto -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                </svg>
-                Novo Projeto
-            </a>
-        </div>
+        <h2 class="text-3xl font-bold text-fatecRed">Meus Projetos</h2>
+        <a href="{% url 'project-create' %}"
+           class="flex items-center gap-2 bg-fatecRed hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow transition text-sm">
+            <!-- Ícone de + -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Novo Projeto
+        </a>
     </div>
-</div>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-2 lg:px-4">
-    <div class="mb-6">
-        <p class="text-gray-600">Aqui estão os projetos que você criou ou está participando.</p>
-    </div> 
+    <!-- Subtexto -->
+    <p class="text-gray-600 mb-8">
+        Aqui estão os projetos que você criou ou está participando.
+    </p>
 
-    <!-- Grid de Projetos -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Grade de Projetos -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for project in projects %}
-        <!-- Card de Projeto -->
-        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-            <div class="flex justify-between items-start">
-                <h3 class="text-lg font-bold text-cps-blue">{{ project.name }}</h3>
-                <span class="bg-fatec-red text-white text-xs px-2 py-1 rounded">
+        <div class="bg-white rounded-2xl p-5 shadow hover:shadow-md transition border border-gray-100">
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="text-lg font-semibold text-gray-800">{{ project.name }}</h3>
+                <span class="text-xs bg-fatecRed text-white px-2 py-1 rounded-full">
                     {{ project.get_status_display }}
                 </span>
             </div>
-            <p class="text-gray-600 mt-2 text-sm">{{ project.description }}</p>
-            
-            <!-- Rodapé do Card -->
-            <div class="mt-4 flex justify-between items-center text-xs text-gray-500">
-                <span>Última atualização: {{ project.updated_at|date:"d/m/Y" }}</span>
-                <a href="{% url 'project' project.id %}" class="bg-fatecRed hover:bg-red-700 text-white px-4 py-1 rounded-lg shadow transition">
+            <p class="text-gray-600 text-sm mb-4">
+                {{ project.description|truncatewords:20 }}
+            </p>
+            <div class="flex justify-between items-center text-xs text-gray-500">
+                <span>Atualizado em: {{ project.updated_at|date:"d/m/Y" }}</span>
+                <a href="{% url 'project' project.id %}"
+                   class="text-white bg-fatecRed hover:bg-red-700 px-4 py-1 rounded-md text-sm transition shadow">
                     Ver detalhes
                 </a>
             </div>
         </div>
         {% empty %}
-        <div class="col-span-3 text-center py-8">
-            <p class="text-gray-500">Nenhum projeto encontrado</p>
-            <a href="{% url 'project-create' %}" class="text-cps-blue hover:underline mt-2 inline-block">Criar primeiro projeto</a>
+        <div class="col-span-3 text-center py-10">
+            <p class="text-gray-500 mb-2">Nenhum projeto encontrado.</p>
+            <a href="{% url 'project-create' %}" class="text-fatecRed hover:underline text-sm font-medium">
+                Criar seu primeiro projeto
+            </a>
         </div>
         {% endfor %}
     </div>

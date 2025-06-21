@@ -2,57 +2,68 @@
 {% load custom_filters %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-  <h2 class="text-2xl font-bold mb-4">Calendário de Tarefas</h2>
+<div class="container mx-auto p-6 max-w-5xl">
+  <h2 class="text-3xl font-bold text-fatecRed mb-6 border-b pb-2">Calendário de Tarefas</h2>
 
   {% if semester %}
-    <p class="text-gray-700 mb-4">
-      Semestre atual: {{ semester.semester }} - Curso: {{ semester.course }}
+    <p class="text-gray-700 mb-6 text-lg">
+      <span class="font-semibold">Semestre atual:</span> {{ semester.semester }} &mdash; 
+      <span class="font-semibold">Curso:</span> {{ semester.course }}
     </p>
   {% endif %}
 
-  <div class="flex justify-between items-center mb-4">
-    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+  <div class="flex justify-between items-center mb-6">
+    <a href="?year={{ prev_year }}&month={{ prev_month }}" 
+       class="px-5 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition font-medium text-gray-700 shadow-sm">
       &laquo; Mês Anterior
     </a>
 
-    <h3 class="text-xl font-semibold">{{ year }}-{{ month_name }}</h3>
+    <h3 class="text-xl font-semibold text-gray-800">
+      {{ year }} - {{ month_name }}
+    </h3>
 
-    <a href="?year={{ next_year }}&month={{ next_month }}" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+    <a href="?year={{ next_year }}&month={{ next_month }}" 
+       class="px-5 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition font-medium text-gray-700 shadow-sm">
       Próximo Mês &raquo;
     </a>
   </div>
 
-  <div class="grid grid-cols-7 gap-2 text-center font-semibold mb-2">
+  <!-- Dias da semana -->
+  <div class="grid grid-cols-7 gap-2 text-center font-semibold text-gray-600 uppercase tracking-wide select-none mb-3">
     <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
   </div>
 
-  <div class="grid grid-cols-7 gap-2 text-sm">
+  <!-- Dias do mês -->
+  <div class="grid grid-cols-7 gap-3 text-sm">
     {% for _ in "0123456"|make_list %}
       {% if forloop.counter0 < weekday_start %}
-        <div>&nbsp;</div>
+        <div class="border border-transparent p-3 min-h-[90px]">&nbsp;</div>
       {% endif %}
     {% endfor %}
 
     {% for day in days %}
-      <div class="border rounded p-2 min-h-[80px] text-left bg-gray-50 hover:bg-blue-100">
-        <div class="font-semibold">{{ day.day }}</div>
+      <div class="border border-gray-300 rounded-lg p-3 min-h-[90px] bg-white hover:bg-blue-50 transition-shadow shadow-sm relative">
+        <div class="font-semibold text-gray-800 mb-2">{{ day.day }}</div>
         {% with tasks=calendar_tasks_by_date|get_item:day.date_str %}
           {% if tasks %}
-            {% for task in tasks %}
-              {% if task.due_date and task.due_date < today %}
-                <div class="text-sm text-red-700 bg-red-100 p-1 rounded mt-1 flex items-center gap-1">
-                  <i class='bx bx-error-circle'></i>
-                  {{ task.title }} — {{ task.project.name }}
-                </div>
-              {% else %}
-                <div class="text-sm text-blue-800 mt-1">
-                  • {{ task.title }} — {{ task.project.name }}
-                </div>
-              {% endif %}
-            {% endfor %}
+            <div class="space-y-1 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              {% for task in tasks %}
+                {% if task.due_date and task.due_date < today %}
+                  <div class="text-xs text-red-700 bg-red-100 p-1 rounded flex items-center gap-1">
+                    <i class='bx bx-error-circle'></i>
+                    <span class="truncate" title="{{ task.title }} — {{ task.project.name }}">
+                      {{ task.title }} — {{ task.project.name }}
+                    </span>
+                  </div>
+                {% else %}
+                  <div class="text-xs text-blue-800 p-1 rounded truncate" title="{{ task.title }} — {{ task.project.name }}">
+                    • {{ task.title }} — {{ task.project.name }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
           {% else %}
-            <div class="text-xs text-gray-400">Sem tarefas</div>
+            <div class="text-xs text-gray-400 italic">Sem tarefas</div>
           {% endif %}
         {% endwith %}
       </div>

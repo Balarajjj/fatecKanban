@@ -1,26 +1,25 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q, Count
 from django.http import JsonResponse
-from .models import Project
-from tasks.models import Task
-from .forms import TaskForm
-from .forms import ProjectForm
-from django.views.generic.edit import UpdateView
-from tasks.models import Task
-from django.views.generic.edit import DeleteView
-from django.shortcuts import render
-from django.shortcuts import render
+from django.views.decorators.http import require_GET
+from django.utils.decorators import method_decorator
 from django.utils import timezone
-from .models import Project
 from collections import Counter
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+
+from .models import Project
+from tasks.models import Task
+from .forms import TaskForm, ProjectForm
+
+
+User = get_user_model()
 
 
 def login_view(request):
@@ -52,17 +51,25 @@ def logout_view(request):
 
 @login_required
 def dashboard_home(request):
+    user = request.user
+
+    # Buscar todos os projetos onde o usuário é owner ou membro
+    projetos_do_usuario = Project.objects.filter(
+        Q(owner=user) | Q(members=user)
+    ).distinct()
+
+    # Buscar apenas as tarefas desses projetos
+    tasks_dos_projetos = Task.objects.filter(project__in=projetos_do_usuario)
+
     # Tarefas ordenadas por vencimento (futuras e não concluídas)
     upcoming_tasks = (
-        Task.objects.filter(
-            due_date__gte=timezone.now().date(),
-        )
+        tasks_dos_projetos.filter(due_date__gte=timezone.now().date())
         .exclude(status="CO")
         .order_by("due_date")[:5]
     )
 
-    # Status geral
-    status_counts = Counter(Task.objects.values_list("status", flat=True))
+    # Status geral dessas tarefas
+    status_counts = Counter(tasks_dos_projetos.values_list("status", flat=True))
 
     # Convertendo para nomes legíveis
     status_display = {
@@ -72,9 +79,10 @@ def dashboard_home(request):
     }
     status_data = {status_display.get(k, k): v for k, v in status_counts.items()}
 
-    # Top 3 projetos com mais tarefas
-    top_projects = Project.objects.all()
-    top_projects = sorted(top_projects, key=lambda p: p.tasks.count(), reverse=True)[:3]
+    # Top 3 projetos com mais tarefas (dentro dos projetos do usuário)
+    top_projects = sorted(
+        projetos_do_usuario, key=lambda p: p.tasks.count(), reverse=True
+    )[:3]
 
     return render(
         request,
@@ -99,15 +107,7 @@ def home_view(request):
     return render(request, "home/index.html", {"projects": projects, "section": "home"})
 
 
-from django.shortcuts import get_object_or_404, render
-from collections import Counter
-from django.db.models import Q, Count
-from tasks.models import Task
-from .models import Project
-import json
-from django.core.serializers.json import DjangoJSONEncoder
-
-
+@login_required
 def project_view(request, project_id):
     """View detalhada do projeto com quadro Kanban e dashboards"""
     project = get_object_or_404(
@@ -127,7 +127,7 @@ def project_view(request, project_id):
 
     all_tasks = project.tasks.all()
 
-    # ✅ Cálculo da barra de progresso
+    # Cálculo da barra de progresso
     total_tasks = all_tasks.count()
     completed_tasks = all_tasks.filter(status="CO").count()
     progress = int((completed_tasks / total_tasks) * 100) if total_tasks > 0 else 0
@@ -189,7 +189,7 @@ def project_view(request, project_id):
     context = {
         "project": project,
         "tasks": tasks,
-        "progress": progress,  # ✅ progresso para usar no HTML
+        "progress": progress,
         "status_data_json": json.dumps(status_data, cls=DjangoJSONEncoder),
         "task_by_collaborator_json": json.dumps(
             task_by_collaborator, cls=DjangoJSONEncoder
@@ -208,7 +208,18 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        members_ids_csv = self.request.POST.get("members_ids", "")
+        members_ids = members_ids_csv.split(",") if members_ids_csv else []
+
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        members = User.objects.filter(id__in=members_ids)
+        self.object.members.set(members)
+
+        return response
 
     def get_success_url(self):
         return reverse_lazy("home")
@@ -219,9 +230,25 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ProjectForm
     template_name = "home/project_form.html"
     success_url = reverse_lazy("home")
+    MAX_MEMBERS = 10  # exemplo de limite
 
     def get_queryset(self):
         return Project.objects.filter(owner=self.request.user)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        members_ids_str = self.request.POST.get("members_ids", "")
+        if members_ids_str:
+            members_ids = [int(i) for i in members_ids_str.split(",") if i.isdigit()]
+            if len(members_ids) > self.MAX_MEMBERS:
+                form.add_error(
+                    None, f"Limite máximo de {self.MAX_MEMBERS} membros por projeto."
+                )
+                return self.form_invalid(form)
+            self.object.members.set(members_ids)
+
+        return response
 
 
 class ProjectDeleteView(LoginRequiredMixin, DeleteView):
@@ -249,6 +276,33 @@ def update_task_status(request, task_id):
             return JsonResponse({"success": True})
 
     return JsonResponse({"success": False}, status=400)
+
+
+@login_required
+@require_GET
+def user_search_api(request):
+    """API para buscar usuários via query string 'q'"""
+    q = request.GET.get("q", "")
+    results = []
+    if q:
+        users = (
+            User.objects.filter(
+                Q(username__icontains=q)
+                | Q(first_name__icontains=q)
+                | Q(last_name__icontains=q)
+            )
+            .exclude(id=request.user.id)  # opcional: não mostrar o próprio usuário
+            .order_by("username")[:10]
+        )
+        results = [
+            {
+                "id": user.id,
+                "username": user.username,
+                "full_name": f"{user.first_name} {user.last_name}".strip(),
+            }
+            for user in users
+        ]
+    return JsonResponse({"results": results})
 
 
 @login_required

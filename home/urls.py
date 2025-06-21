@@ -7,6 +7,7 @@ from .views import (
     ProjectDeleteView,
     useful_links_view,
     dashboard_home,
+    user_search_api,
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     ),
     path("links/", useful_links_view, name="useful-links"),
     path("dashboard/", dashboard_home, name="dashboard_home"),
+    path("user_search_api/", user_search_api, name="user_search_api"),
 ]

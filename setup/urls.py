@@ -22,7 +22,7 @@ from tasks import views as task_views
 from calendarapp import views as calendar_views
 from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
-
+from django.contrib.auth import views as LogoutView
 
 """
 
@@ -34,14 +34,11 @@ Nessa parte aqui eu to importando dos meus próprios arquivos de views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("project/<int:project_id>/", views.project_view, name="project"),
+    path("notificacoes/", include("notifications.urls")),
     path("accounts/", include("accounts.urls")),
     path("tarefas/", include("tasks.urls")),
     path("calendario/", include("calendarapp.urls")),
     path("login/", include("accounts.urls")),
-    path(
-        "logout/",
-        auth_views.LogoutView.as_view(template_name="accounts/logout.html"),
-        name="logout",
-    ),
+    path("logout/", accounts_views.logout_view, name="logout"),
     path("", include("home.urls")),
 ]

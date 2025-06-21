@@ -1,27 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="max-w-7xl mx-auto mt-10 p-6">
-    <h2 class="text-3xl font-bold text-fatecRed mb-8">Dashboard Geral</h2>
+<div class="max-w-7xl mx-auto mt-10 p-6 space-y-10">
+    <h2 class="text-3xl font-bold text-fatecRed">Dashboard Geral</h2>
 
     <!-- Linha de cima -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         <!-- Card: Tarefas próximas do vencimento -->
         <div class="bg-white shadow rounded-2xl p-6">
             <h3 class="text-xl font-semibold mb-4 text-gray-800">Tarefas Próximas do Vencimento</h3>
-            <ul class="space-y-3">
+            <div class="space-y-4 overflow-y-auto max-h-96">
                 {% if upcoming_tasks %}
                     {% for task in upcoming_tasks %}
-                        <li class="flex justify-between items-center">
-                            <span class="text-gray-700 font-medium">{{ task.title }}</span>
-                            <span class="text-sm text-gray-500">{{ task.due_date|date:"d/m/Y" }}</span>
-                        </li>
+                        <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-sm transition">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-fatecRed/10 text-fatecRed p-2 rounded-full">
+                                    <i class='bx bx-calendar-event text-lg'></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800 truncate max-w-[220px]" title="{{ task.title }}">
+                                        {{ task.title }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Projeto: <span class="font-semibold">{{ task.project.name }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-600 whitespace-nowrap">
+                                {{ task.due_date|date:"d/m/Y" }}
+                            </span>
+                        </div>
                     {% endfor %}
                 {% else %}
-                    <li class="text-gray-500">Nenhuma tarefa próxima do vencimento.</li>
+                    <div class="text-gray-500 italic">Nenhuma tarefa próxima do vencimento.</div>
                 {% endif %}
-            </ul>
+            </div>
         </div>
 
         <!-- Card: Gráfico de Pizza -->
@@ -50,7 +64,7 @@
 </div>
 
 <!-- Script Chart.js -->
- {{ status_data|json_script:"status-data" }}
+{{ status_data|json_script:"status-data" }}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

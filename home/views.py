@@ -216,8 +216,10 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         from django.contrib.auth import get_user_model
 
         User = get_user_model()
+
+        # Adiciona o dono como membro
         members = User.objects.filter(id__in=members_ids)
-        self.object.members.set(members)
+        self.object.members.set(list(members) + [self.request.user])
 
         return response
 

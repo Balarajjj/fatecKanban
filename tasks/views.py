@@ -5,13 +5,12 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.db.models import Q
-
 import json
 
 from .models import Task
-from .forms import TaskForm
+from .forms import TaskForm, TaskEditForm
 from home.models import Project
-from notifications.models import Notification  # IMPORTANTE
+from notifications.models import Notification
 
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
@@ -19,17 +18,24 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
     form_class = TaskForm
     template_name = "tasks/task_form.html"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        project = get_object_or_404(Project, id=self.kwargs["project_id"])
+        kwargs["project"] = project  # Passa o projeto para o form limitar os membros
+        return kwargs
+
     def form_valid(self, form):
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
         form.instance.project = project
         form.instance.created_by = self.request.user
 
+        # Se não houver responsável, define o dono do projeto
         if not form.instance.assigned_to:
             form.instance.assigned_to = project.owner
 
         response = super().form_valid(form)
 
-        # Notifica se o responsável não for o criador
+        # Notificação se o responsável for diferente do criador
         assigned_user = form.instance.assigned_to
         if assigned_user and assigned_user != self.request.user:
             Notification.objects.create(
@@ -51,8 +57,13 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
-    form_class = TaskForm
-    template_name = "tasks/task_form.html"
+    form_class = TaskEditForm
+    template_name = "tasks/task_edit.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["project"] = self.get_object().project
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy("project", kwargs={"project_id": self.object.project.id})
